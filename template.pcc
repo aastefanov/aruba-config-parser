@@ -1,0 +1,38 @@
+<vars>
+snmp_defaults = {
+    "restrict": "restricted"
+}
+</vars>
+
+<group name="snmp.communities.{{name}}" default="snmp_defaults">
+snmp-server community "{{name | _start_ }}"
+snmp-server community "{{name | _start_ }}" {{restrict}}
+</group>
+<group name="snmp.traps">
+snmp-server host {{ip | _start_ }} community "{{community}}" trap-level "{{traplevel}}"
+</group>
+
+
+<group name="ports.{{interface}}">
+interface {{interface}}
+   name "{{name | ORPHRASE}}"
+</group>
+<group name="vlans.{{vlan}}">
+vlan {{vlan}}
+   name "{{name | ORPHRASE }}"
+   untagged {{untagged}}
+   tagged {{tagged}}
+   ip address {{ip}} {{mask}}
+</group>
+
+<group name="loop-protect">
+loop-protect {{range}}
+</group>
+
+<group name="properties">
+hostname "{{ hostname }}"
+management-vlan {{ management_vlan }}
+snmp-server contact "{{contact | ORPHRASE}}" location "{{location | ORPHRASE }}"
+
+ip default-gateway {{default-gw}}
+</group>
