@@ -1,6 +1,18 @@
 ASSIGN_VLANS_BY_ID = False
 
 
+def split_range(numbers):
+    ranges = numbers.replace(' ', '').split(',')
+
+    for vl_range in ranges:
+        if '-' in vl_range:
+            (start, end) = vl_range.split('-', 1)
+            for i in range(int(start), int(end) + 1):
+                yield i
+        else:
+            yield int(vl_range)
+
+
 def add_management_vlan(res, vlans):
     vlans[int(res)]['management'] = True
 
@@ -16,24 +28,21 @@ def get_ports(res):
 
 def get_vlan_names(res):
     for vid_str, props in res.items():
-        if ASSIGN_VLANS_BY_ID:
-            yield int(vid_str), int(vid_str)
-        else:
-            yield int(vid_str), props['name']
+        yield int(vid_str), \
+              int(vid_str) if ASSIGN_VLANS_BY_ID else props['name']
 
 
-def get_vlans(res, ports):
-    vlan_names = dict(get_vlan_names(res))
+def get_vlans(res):
     for vid_str, props in res.items():
         vid = int(vid_str)
 
         if props.keys() <= {'name', 'tagged', 'untagged'}:
             vlan_obj = props['name']
-            yield vid, vlan_obj
         else:
             vlan_obj = {'name': props['name']}
             if 'ip' in props:
                 vlan_obj['ip_address_mode'] = 'IAAM_STATIC'
                 vlan_obj['ip_address'] = props['ip']
                 vlan_obj['mask'] = props['mask']
-            yield vid, vlan_obj
+
+        yield vid, vlan_obj
