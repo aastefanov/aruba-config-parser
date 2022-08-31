@@ -1,4 +1,4 @@
 .idea/
-__pycache__/
-*.pcc
+**/__pycache__/
 out/
+venv/
